@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- RM Designs Studio shared engine: ERP / SERPs reading and writing, the car scene and the 3D viewer
+         (see Directory.Build.props); EgoEngineLibrary comes with it -->
+    <ProjectReference Include="$(StudioShared)src\Studio.Core\Studio.Core.csproj" />
+    <Using Include="Studio.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- RM Designs wordmark for the HTML report header -->
+    <EmbeddedResource Include="Assets\wordmark.svg" LogicalName="wordmark.svg" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- the steering wheel engine (and through it the RM Designs Studio shared engine, see Directory.Build.props) -->
+    <ProjectReference Include="$(WheelSwapCore)WheelSwap.Core.csproj" />
+    <Using Include="Studio.Core" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

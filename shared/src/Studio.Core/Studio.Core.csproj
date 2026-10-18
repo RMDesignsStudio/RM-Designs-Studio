@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- RM Designs Studio shared engine: EGO / ERP / SERPs reading, the car scene and its WebGL2 renderer, and the
+       texture pipeline. Shared by every Studio app (Livery Previewer, Steering Wheel Swapper), which reference it
+       from this folder. Windows only: image files are read with Windows' own codecs (WIC). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\external\EgoEngineLibrary\EgoEngineLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Livery.Core" />
+    <InternalsVisibleTo Include="Livery.Tests" />
+  </ItemGroup>
+
+</Project>

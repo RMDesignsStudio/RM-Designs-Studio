@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- RM Designs Studio shared window look: the borderless app window (the brand band is the title bar) and its
+       minimise / maximise / close buttons. Used by every Studio app's main window. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

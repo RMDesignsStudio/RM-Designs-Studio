@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/shared/">
+    <Project Path="../shared/external/EgoEngineLibrary/EgoEngineLibrary.csproj" />
+    <Project Path="../shared/src/Studio.Core/Studio.Core.csproj" />
+    <Project Path="../shared/src/Studio.Ui/Studio.Ui.csproj" />
+  </Folder>
+  <Folder Name="/wheel/">
+    <Project Path="../Wheel Swap Engine/WheelSwap.Core/WheelSwap.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Swapper.App/Swapper.App.csproj" />
+    <Project Path="src/Swapper.Cli/Swapper.Cli.csproj" />
+    <Project Path="src/Swapper.Core/Swapper.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Swapper.Tests/Swapper.Tests.csproj" />
+  </Folder>
+</Solution>

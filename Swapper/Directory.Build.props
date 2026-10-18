@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- the RM Designs Studio shared engine (Studio.Core + EgoEngineLibrary, Studio.Ui), beside this app's folder in RM Designs Studio -->
+    <StudioShared>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'shared'))</StudioShared>
+    <!-- the steering wheel engine (WheelSwap.Core), in its own folder beside this app -->
+    <WheelSwapCore>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'Wheel Swap Engine', 'WheelSwap.Core'))</WheelSwapCore>
+  </PropertyGroup>
+</Project>

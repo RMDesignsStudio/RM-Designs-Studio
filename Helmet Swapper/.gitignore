@@ -1,0 +1,12 @@
+# build output
+bin/
+obj/
+.vs/
+*.user
+# published apps, share packages, generated files
+dist/
+dist-next/
+share/
+out/
+tests/out/
+*.serps

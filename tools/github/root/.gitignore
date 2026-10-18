@@ -1,0 +1,18 @@
+# build output
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+# published apps, share packages, test output
+dist/
+dist-next/
+share/
+out/
+tests/out/
+# game files and templates never go in the repository
+*.serps
+*.simplified
+*.erp
+*.mipmaps

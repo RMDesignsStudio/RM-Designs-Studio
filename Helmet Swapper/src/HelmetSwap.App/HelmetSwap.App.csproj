@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- RM Designs fonts (Presicav, Roboto Mono), embedded so the app looks the same on any PC -->
+    <Resource Include="Fonts\*.ttf" />
+    <Resource Include="app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HelmetSwap.Core\HelmetSwap.Core.csproj" />
+    <ProjectReference Include="$(StudioShared)src\Studio.Ui\Studio.Ui.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the in-app 3D preview: Edge's WebView2 (the runtime ships with Windows 10 and 11) -->
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Helmet Swapper</AssemblyName>
+    <Product>Helmet Swapper</Product>
+    <Version>1.8.0</Version>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <CopyDocumentationFilesFromPackages>false</CopyDocumentationFilesFromPackages>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+  </PropertyGroup>
+
+</Project>

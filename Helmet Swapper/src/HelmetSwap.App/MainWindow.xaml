@@ -1,0 +1,336 @@
+<Window x:Class="HelmetSwap.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:HelmetSwap.App"
+        xmlns:ui="clr-namespace:Studio.Ui;assembly=Studio.Ui"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="Helmet Swapper" Height="1000" Width="940" MinHeight="560" MinWidth="720"
+        Background="{StaticResource Paper}" WindowStartupLocation="CenterScreen" Icon="pack://application:,,,/app.ico"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Ideal">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- brand band -->
+        <DockPanel Background="{StaticResource Purple}" Height="64" LastChildFill="False">
+            <Image DockPanel.Dock="Left" Source="{StaticResource Wordmark}" Height="20" Margin="26,0,0,0" VerticalAlignment="Center"/>
+            <!-- the band is the title bar (Studio.Ui): window buttons at its right end -->
+            <ui:CaptionButtons DockPanel.Dock="Right"/>
+            <local:Tracked DockPanel.Dock="Right" Text="Helmet Swapper" Margin="0,0,18,0" VerticalAlignment="Center"
+                           FontFamily="{StaticResource Display}" FontWeight="Heavy" FontSize="12" Tracking="0.16" Foreground="{StaticResource Paper}"/>
+        </DockPanel>
+
+        <Grid x:Name="Body" Grid.Row="1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="FormCol" Width="940" MinWidth="660"/>
+            <ColumnDefinition x:Name="SplitCol" Width="12"/>
+            <ColumnDefinition x:Name="PreviewCol" Width="*" MinWidth="420"/>
+        </Grid.ColumnDefinitions>
+        <!-- the picks: they scroll when the window is too short for them (the log keeps at least its minimum) -->
+        <ScrollViewer x:Name="FormScroll" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScroll}"/>
+            </ScrollViewer.Resources>
+        <Grid x:Name="FormGrid" Margin="26,20,16,22" VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" MinHeight="64"/>
+            </Grid.RowDefinitions>
+
+            <!-- the faded "26" from the RM Designs posts (drawn first, so everything sits on top of it) -->
+            <TextBlock Grid.Row="0" Grid.RowSpan="3" Text="26" FontFamily="{StaticResource Display}" FontWeight="Heavy" FontSize="132"
+                       Foreground="{StaticResource Purple}" Opacity="0.07" HorizontalAlignment="Right" VerticalAlignment="Top"
+                       Margin="0,-26,-4,0" IsHitTestVisible="False"/>
+
+            <StackPanel Grid.Row="0">
+                <StackPanel Orientation="Horizontal">
+                    <local:Tracked Text="Helmet Swap" FontFamily="{StaticResource Display}" FontWeight="Heavy" FontSize="22" Tracking="0.1" VerticalAlignment="Center"/>
+                    <!-- version: purple box, white Roboto Mono Bold (as in the Steering Wheel Swapper) -->
+                    <Border Background="{StaticResource Purple}" Padding="10,4,10,5" Margin="16,0,0,0" VerticalAlignment="Center"
+                            AutomationProperties.Name="Version">
+                        <TextBlock x:Name="VersionText" FontFamily="{StaticResource Mono}" FontWeight="Bold" FontSize="15" Foreground="{StaticResource Paper}"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Style="{StaticResource Sub}" Margin="0,6,0,0"
+                           Text="*one driver's whole helmet onto another · any make · f1, f2 or career · helmets from 2024–2026 · the game is never changed"/>
+            </StackPanel>
+            <Border Grid.Row="1" Height="1" Background="{StaticResource Purple}" Margin="0,14,0,12"/>
+
+            <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                <local:Tracked Style="{StaticResource Label}" Text="F1 25 game folder"/>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Detect" Click="Detect_Click"/>
+                    <Button DockPanel.Dock="Right" Content="Browse" Click="BrowseGame_Click"/>
+                    <TextBox x:Name="GameBox" LostFocus="GameBox_LostFocus"/>
+                </DockPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                <DockPanel Margin="0,0,0,7">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- 2025 drivers can be changed too (regular grids, special liveries, story drivers) -->
+                        <RadioButton x:Name="TargetYAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetYear" Content="All" Checked="Series_Changed" AutomationProperties.Name="Driver to change: all seasons"/>
+                        <RadioButton x:Name="TargetY2026" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetYear" Content="2026" IsChecked="True" Checked="Series_Changed" AutomationProperties.Name="Driver to change: 2026"/>
+                        <RadioButton x:Name="TargetY2025" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,14,0" GroupName="TargetYear" Content="2025" Checked="Series_Changed" AutomationProperties.Name="Driver to change: 2025"/>
+                        <RadioButton x:Name="TargetSAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Ink}" Margin="0,0,-1,0" GroupName="TargetSeries" Content="All" Checked="Series_Changed" AutomationProperties.Name="Driver to change: all series"/>
+                        <RadioButton x:Name="TargetF1" Style="{StaticResource SeriesTab}" Tag="{StaticResource F1Red}" Margin="0,0,-1,0" GroupName="TargetSeries" Content="F1" IsChecked="True" Checked="Series_Changed" AutomationProperties.Name="Driver to change: F1"/>
+                        <RadioButton x:Name="TargetF2" Style="{StaticResource SeriesTab}" Tag="{StaticResource F2Blue}" Margin="0,0,-1,0" GroupName="TargetSeries" Content="F2" Checked="Series_Changed" AutomationProperties.Name="Driver to change: F2"/>
+                        <RadioButton x:Name="TargetCareer" Style="{StaticResource SeriesTab}" Tag="{StaticResource Magenta}" GroupName="TargetSeries" Content="Career" Checked="Series_Changed" AutomationProperties.Name="Driver to change: career helmets"/>
+                    </StackPanel>
+                    <local:Tracked Style="{StaticResource Label}" Text="Driver to change" Margin="0" VerticalAlignment="Center"/>
+                </DockPanel>
+                <!-- search / make / team: any season and series at once -->
+                <Grid x:Name="TargetFilter" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="160"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid>
+                        <TextBox x:Name="TargetSearch" Height="30" TextChanged="Filter_Changed" AutomationProperties.Name="Driver to change: search"/>
+                        <TextBlock Text="search name, team, make or year" IsHitTestVisible="False" Margin="10,0" VerticalAlignment="Center"
+                                   FontFamily="{StaticResource Mono}" FontWeight="Bold" FontSize="11.5" Foreground="#A8A2B8">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=TargetSearch}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <WrapPanel x:Name="TargetFilterRight" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <RadioButton x:Name="TargetMakeAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetMake" Content="All makes" IsChecked="True" Checked="Filter_Changed" AutomationProperties.Name="Driver to change: All makes"/>
+                        <RadioButton x:Name="TargetMakeArai" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetMake" Content="Arai" Checked="Filter_Changed" AutomationProperties.Name="Driver to change: Arai"/>
+                        <RadioButton x:Name="TargetMakeBell" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetMake" Content="Bell" Checked="Filter_Changed" AutomationProperties.Name="Driver to change: Bell"/>
+                        <RadioButton x:Name="TargetMakeSchuberth" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="TargetMake" Content="Schuberth" Checked="Filter_Changed" AutomationProperties.Name="Driver to change: Schuberth"/>
+                        <RadioButton x:Name="TargetMakeStilo" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,0,0" GroupName="TargetMake" Content="Stilo" Checked="Filter_Changed" AutomationProperties.Name="Driver to change: Stilo"/>
+                    </StackPanel>
+                        <ComboBox x:Name="TargetTeam" Width="196" Margin="10,0,0,0" SelectionChanged="Team_Changed" AutomationProperties.Name="Driver to change: team"/>
+                    </WrapPanel>
+                </Grid>
+                <ScrollViewer x:Name="TargetScroll" MaxHeight="216" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScroll}"/>
+                    </ScrollViewer.Resources>
+                    <ListBox x:Name="TargetBox" Style="{StaticResource Chips}" IsSynchronizedWithCurrentItem="False" SelectionChanged="Target_Changed"/>
+                </ScrollViewer>
+                <!-- the one "Career Design" chip: which in-game design slot it replaces (they are all the same helmet) -->
+                <StackPanel x:Name="SlotRow" Orientation="Horizontal" Margin="0,4,0,6" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource Sub}" FontSize="11" VerticalAlignment="Center" Margin="0,0,10,0"
+                               Text="replaces the career design you pick in game:"/>
+                    <ComboBox x:Name="DesignSlot" Width="300" SelectionChanged="DesignSlot_Changed" AutomationProperties.Name="Career design slot"/>
+                </StackPanel>
+                <TextBlock x:Name="TargetEmpty" Style="{StaticResource Sub}" FontSize="11" Margin="0,2,0,6" TextWrapping="Wrap" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="4" Margin="0,0,0,10">
+                <DockPanel Margin="0,0,0,7">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- helmets from older seasons (donors only) -->
+                        <RadioButton x:Name="DonorYAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorYear" Content="All" Checked="Series_Changed" AutomationProperties.Name="Helmet from: all seasons"/>
+                        <RadioButton x:Name="DonorY2026" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorYear" Content="2026" IsChecked="True" Checked="Series_Changed" AutomationProperties.Name="Helmet from: 2026"/>
+                        <RadioButton x:Name="DonorY2025" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorYear" Content="2025" Checked="Series_Changed" AutomationProperties.Name="Helmet from: 2025"/>
+                        <RadioButton x:Name="DonorY2024" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,14,0" GroupName="DonorYear" Content="2024" Checked="Series_Changed" AutomationProperties.Name="Helmet from: 2024"/>
+                        <RadioButton x:Name="DonorSAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Ink}" Margin="0,0,-1,0" GroupName="DonorSeries" Content="All" Checked="Series_Changed" AutomationProperties.Name="Helmet from: all series"/>
+                        <RadioButton x:Name="DonorF1" Style="{StaticResource SeriesTab}" Tag="{StaticResource F1Red}" Margin="0,0,-1,0" GroupName="DonorSeries" Content="F1" IsChecked="True" Checked="Series_Changed" AutomationProperties.Name="Helmet from: F1"/>
+                        <RadioButton x:Name="DonorF2" Style="{StaticResource SeriesTab}" Tag="{StaticResource F2Blue}" Margin="0,0,-1,0" GroupName="DonorSeries" Content="F2" Checked="Series_Changed" AutomationProperties.Name="Helmet from: F2"/>
+                        <RadioButton x:Name="DonorCareer" Style="{StaticResource SeriesTab}" Tag="{StaticResource Magenta}" GroupName="DonorSeries" Content="Career" Checked="Series_Changed" AutomationProperties.Name="Helmet from: career helmets"/>
+                    </StackPanel>
+                    <local:Tracked Style="{StaticResource Label}" Text="Helmet from" Margin="0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="DonorHint" Style="{StaticResource Sub}" FontSize="11" Margin="14,0,14,0" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                </DockPanel>
+                <!-- search / make / team: any season and series at once -->
+                <Grid x:Name="DonorFilter" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="160"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid>
+                        <TextBox x:Name="DonorSearch" Height="30" TextChanged="Filter_Changed" AutomationProperties.Name="Helmet from: search"/>
+                        <TextBlock Text="search name, team, make or year" IsHitTestVisible="False" Margin="10,0" VerticalAlignment="Center"
+                                   FontFamily="{StaticResource Mono}" FontWeight="Bold" FontSize="11.5" Foreground="#A8A2B8">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=DonorSearch}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <WrapPanel x:Name="DonorFilterRight" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <RadioButton x:Name="DonorMakeAll" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorMake" Content="All makes" IsChecked="True" Checked="Filter_Changed" AutomationProperties.Name="Helmet from: All makes"/>
+                        <RadioButton x:Name="DonorMakeArai" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorMake" Content="Arai" Checked="Filter_Changed" AutomationProperties.Name="Helmet from: Arai"/>
+                        <RadioButton x:Name="DonorMakeBell" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorMake" Content="Bell" Checked="Filter_Changed" AutomationProperties.Name="Helmet from: Bell"/>
+                        <RadioButton x:Name="DonorMakeSchuberth" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,-1,0" GroupName="DonorMake" Content="Schuberth" Checked="Filter_Changed" AutomationProperties.Name="Helmet from: Schuberth"/>
+                        <RadioButton x:Name="DonorMakeStilo" Style="{StaticResource SeriesTab}" Tag="{StaticResource Purple}" Margin="0,0,0,0" GroupName="DonorMake" Content="Stilo" Checked="Filter_Changed" AutomationProperties.Name="Helmet from: Stilo"/>
+                    </StackPanel>
+                        <ComboBox x:Name="DonorTeam" Width="196" Margin="10,0,0,0" SelectionChanged="Team_Changed" AutomationProperties.Name="Helmet from: team"/>
+                    </WrapPanel>
+                </Grid>
+                <!-- up to six rows of chips; longer lists (2025 F1: regulars, specials, story drivers) scroll -->
+                <ScrollViewer x:Name="DonorScroll" MaxHeight="216" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScroll}"/>
+                    </ScrollViewer.Resources>
+                    <ListBox x:Name="DonorBox" Style="{StaticResource Chips}" IsSynchronizedWithCurrentItem="False" SelectionChanged="Donor_Changed" PreviewMouseLeftButtonUp="DonorBox_MouseUp"/>
+                </ScrollViewer>
+                <TextBlock x:Name="DonorEmpty" Style="{StaticResource Sub}" FontSize="11" Margin="0,2,0,6" TextWrapping="Wrap" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <!-- the parts: one slot each, saying whose that part is (a helmet picked below, or the driver's own); click slots to send
+                 the next helmet picked to those parts only; the note (what is kept, a fit warning) under them, wrapping -->
+            <StackPanel Grid.Row="5" Margin="0,2,0,12">
+            <WrapPanel x:Name="SlotPanel">
+                <local:Tracked Style="{StaticResource Label}" Text="Parts" Margin="0,3,18,3" VerticalAlignment="Center"/>
+            </WrapPanel>
+            <TextBlock x:Name="PartsHint" Style="{StaticResource Sub}" FontSize="11" Margin="0,6,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="6" Margin="0,0,0,12">
+                <local:Tracked Style="{StaticResource Label}" Text="Save as"/>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Browse" Click="BrowseOut_Click"/>
+                    <TextBox x:Name="OutBox"/>
+                </DockPanel>
+            </StackPanel>
+
+            <WrapPanel Grid.Row="7" Margin="0,0,0,4">
+                <Button x:Name="BuildButton" DockPanel.Dock="Left" Style="{StaticResource Primary}" Margin="0,0,14,8" Content="Build" Click="Build_Click"/>
+                <Button x:Name="PopButton" DockPanel.Dock="Left" Margin="0,0,14,8" Content="Pop out preview" Click="Pop_Click"
+                        AutomationProperties.AutomationId="PopButton" ToolTip="The 3D preview in its own window (resizable, e.g. on another screen); close it to put it back"/>
+                <Button x:Name="PreviewButton" DockPanel.Dock="Left" Margin="0,0,14,8" Content="Open in browser" Click="Preview_Click"
+                        AutomationProperties.Name="Open preview in browser" ToolTip="The 3D preview as a page in your browser (bigger, and it can stay open)"/>
+                <Button x:Name="ExportButton" DockPanel.Dock="Left" Margin="0,0,14,8" Content="Export 3D model" Click="Export_Click"
+                        AutomationProperties.AutomationId="ExportButton"
+                        ToolTip="The helmet as shown in the preview's after view (or the driver's own, with no helmet picked to give) as FBX + OBJ, one texture set per painted part, with its textures and UV layouts: for Substance Painter or Blender"/>
+                <Button x:Name="ShowButton" DockPanel.Dock="Left" Margin="0,0,14,8" Content="Show in folder" Visibility="Collapsed" Click="Show_Click"/>
+                <CheckBox x:Name="PicturesBox" Margin="4,0,4,8" VerticalAlignment="Center" AutomationProperties.Name="Hover previews"
+                          Checked="Pictures_Changed" Unchecked="Pictures_Changed"
+                          ToolTip="A preview of each helmet when you hover it in the lists">
+                    <local:Tracked Text="Hover previews" FontFamily="{StaticResource Display}" FontWeight="Bold" FontSize="10.5" Tracking="0.14"/>
+                </CheckBox>
+                <!-- the note on how the previews are made: shown at once on hover, pinned open by a click (until a click elsewhere) -->
+                <Button x:Name="PreviewsInfo" Margin="0,0,14,8" VerticalAlignment="Center" Cursor="Hand"
+                        AutomationProperties.Name="About hover previews" AutomationProperties.HelpText="{Binding Text, ElementName=PreviewsNote}"
+                        MouseEnter="PreviewsInfo_Enter" MouseLeave="PreviewsInfo_Leave" Click="PreviewsInfo_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <!-- Material Symbols "info" (outlined, weight 400) by Google, Apache License 2.0 -->
+                            <Border x:Name="Back" Width="18" Height="18" CornerRadius="9" Background="Transparent">
+                                <Path x:Name="Mark" Width="14" Height="14" Stretch="Uniform" Fill="{StaticResource Purple}"
+                                          Data="F1 M440,-280h80v-240h-80v240Zm68.5,-331.5Q520,-623 520,-640t-11.5,-28.5Q497,-680 480,-680t-28.5,11.5Q440,-657 440,-640t11.5,28.5Q463,-600 480,-600t28.5,-11.5ZM480,-80q-83,0 -156,-31.5T197,-197q-54,-54 -85.5,-127T80,-480q0,-83 31.5,-156T197,-763q54,-54 127,-85.5T480,-880q83,0 156,31.5T763,-763q54,54 85.5,127T880,-480q0,83 -31.5,156T763,-197q-54,54 -127,85.5T480,-80Zm0,-80q134,0 227,-93t93,-227q0,-134 -93,-227t-227,-93q-134,0 -227,93t-93,227q0,134 93,227t227,93Z"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Back" Property="Background" Value="{StaticResource LineSoft}"/>
+                                    <Setter TargetName="Mark" Property="Fill" Value="{StaticResource Deep}"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Back" Property="Background" Value="{StaticResource LineSoft}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <TextBlock x:Name="PreviewsProgress" Margin="0,0,14,8" VerticalAlignment="Center" Visibility="Collapsed"
+                           FontFamily="{StaticResource Mono}" FontWeight="Bold" FontSize="11" Foreground="{StaticResource Muted}"
+                           AutomationProperties.AutomationId="PreviewsProgress"
+                           ToolTip="The hover previews are being made in the background; the app works as usual meanwhile"/>
+                <Popup x:Name="PreviewsPop" PlacementTarget="{Binding ElementName=PreviewsInfo}" Placement="Top" VerticalOffset="-6"
+                       HorizontalOffset="-12" AllowsTransparency="True" StaysOpen="True">
+                    <Border Background="{StaticResource Deep}" BorderBrush="{StaticResource Purple}" BorderThickness="1" Padding="14,11" MaxWidth="360">
+                        <StackPanel>
+                            <local:Tracked Text="Hover previews" FontFamily="{StaticResource Display}" FontWeight="Bold" FontSize="10.5" Tracking="0.14"
+                                           Foreground="White" Margin="0,0,0,6"/>
+                            <TextBlock x:Name="PreviewsNote" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" FontSize="12" LineHeight="19" Foreground="#E6E0F5"
+                                       Text="Hover over any helmet in the lists to see what it looks like.&#10;&#10;The first time you open Helmet Swapper, these previews are made from your game in the background. It takes about a minute (longer on a slower PC), and you can keep using the app while it works. After that they appear instantly.&#10;&#10;On a slower PC? Untick Hover previews to skip this."/>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+                <Border x:Name="StatusPill" DockPanel.Dock="Right" Margin="0,0,14,8" Padding="10,6" VerticalAlignment="Center" Visibility="Collapsed" Background="{StaticResource Teal}">
+                    <local:Tracked x:Name="StatusText" FontFamily="{StaticResource Display}" FontWeight="Heavy" FontSize="9.5" Tracking="0.14" Foreground="{StaticResource Ink}"/>
+                </Border>
+                <ProgressBar x:Name="Busy" DockPanel.Dock="Right" Width="140" Height="4" Margin="0,0,14,8" IsIndeterminate="True" Visibility="Collapsed"
+                             Background="{StaticResource LineSoft}" BorderThickness="0" Foreground="{StaticResource Purple}" VerticalAlignment="Center"/>
+            </WrapPanel>
+
+            <Border Grid.Row="8" Background="{StaticResource Deep}">
+                <ListBox x:Name="LogList" Background="Transparent" BorderThickness="0" FontFamily="{StaticResource Mono}" FontSize="11.5"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="8,8,2,8">
+                    <ListBox.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScroll}"/>
+                    </ListBox.Resources>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="4,1"/>
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="{TemplateBinding Padding}"/></ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" Foreground="{Binding Brush}" TextWrapping="Wrap" LineHeight="18"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Grid>
+        </ScrollViewer>
+
+        <!-- the 3D preview: follows the picks; the page has its own controls (views, studio, before / after) -->
+        <!-- drag to make the preview bigger or smaller (the width is remembered) -->
+        <GridSplitter x:Name="Splitter" Grid.Column="1" Width="12" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"
+                      Background="Transparent" Cursor="SizeWE" Focusable="False" DragDelta="Splitter_DragDelta" DragCompleted="Splitter_DragCompleted" MouseDoubleClick="Splitter_DoubleClick"
+                      AutomationProperties.AutomationId="Splitter" ToolTip="Drag to resize the preview · double-click to reset">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="Transparent">
+                        <Border x:Name="line" Width="2" Margin="0,20,0,22" Background="{StaticResource Line}"/>
+                        <Border x:Name="grip" Width="6" Height="46" Background="{StaticResource Line}" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="line" Property="Background" Value="{StaticResource Purple}"/>
+                            <Setter TargetName="grip" Property="Background" Value="{StaticResource Purple}"/>
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="line" Property="Background" Value="{StaticResource Purple}"/>
+                            <Setter TargetName="grip" Property="Background" Value="{StaticResource Purple}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+
+        <DockPanel x:Name="PreviewPanel" Grid.Column="2" Margin="4,20,26,22">
+            <DockPanel DockPanel.Dock="Top" Margin="0,4,0,9">
+                <local:Tracked Style="{StaticResource Label}" Text="Preview" Margin="0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="PreviewStatus" Style="{StaticResource Sub}" FontSize="11" Margin="14,0,0,0" VerticalAlignment="Center"
+                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" AutomationProperties.AutomationId="PreviewStatus"/>
+            </DockPanel>
+            <Border Background="#111111" BorderBrush="#2B2140" BorderThickness="1">
+                <Grid>
+                    <TextBlock x:Name="PreviewNote" Visibility="Collapsed" Margin="30" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center"
+                               FontFamily="{StaticResource Mono}" FontWeight="Bold" FontSize="12.5" Foreground="#BFB2EA"/>
+                    <wv2:WebView2 x:Name="PreviewView" DefaultBackgroundColor="#111111" AutomationProperties.AutomationId="PreviewView"/>
+                </Grid>
+            </Border>
+        </DockPanel>
+        </Grid>
+    </Grid>
+</Window>
